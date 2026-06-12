@@ -51,6 +51,24 @@ describe('<TaktEvent>', () => {
     expect(track).toHaveBeenCalledWith('Buy', { props: { plan: 'pro' } })
   })
 
+  it('tracks an svg-rooted child without warning', () => {
+    const track = vi.fn()
+    taktStore.value = { track } as unknown as TaktInstance
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    const { container } = render(() => (
+      <TaktEvent name="Icon">
+        <svg data-testid="icon">
+          <circle cx="5" cy="5" r="5" />
+        </svg>
+      </TaktEvent>
+    ))
+    const svg = container.querySelector('svg') as SVGElement
+    fireEvent.click(svg)
+    expect(track).toHaveBeenCalledWith('Icon', undefined)
+    expect(warn).not.toHaveBeenCalled()
+    warn.mockRestore()
+  })
+
   it('warns for a non-element child', () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
     render(() => <TaktEvent name="X">plain text</TaktEvent>)

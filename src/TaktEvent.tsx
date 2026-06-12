@@ -15,7 +15,7 @@ export function TaktEvent(props: TaktEventParams & { children: JSX.Element }): J
   onMount(() => {
     if (isServer) return
     const node = resolved()
-    if (!(node instanceof HTMLElement)) {
+    if (!(node instanceof Element)) {
       console.warn('[takt] <TaktEvent> expects a single element child; tracking is disabled.')
       return
     }

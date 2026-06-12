@@ -16,7 +16,14 @@ jobs:
   build:
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    name: build
+    # Exercise the advertised peerDependencies.solid-js floor (^1.8) as well as
+    # the current line; solid-js is a single runtime package, so swapping the
+    # version after a frozen install is safe (no coupled toolchain).
+    strategy:
+      fail-fast: false
+      matrix:
+        solid: ['1.8', '1.9']
+    name: build (solid@${{ matrix.solid }})
     steps:
       # Third-party actions are pinned to a full commit SHA (supply-chain
       # hardening); the trailing comment tracks the human-readable version.
@@ -29,6 +36,7 @@ jobs:
           node-version: 20
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      - run: pnpm add -D solid-js@${{ matrix.solid }}
       - run: pnpm lint
       - run: pnpm typecheck
       - run: pnpm test
