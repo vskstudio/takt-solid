@@ -134,6 +134,26 @@ Privacy attributes (`respect-dnt`, `exclude-localhost`, `spa`) are on by default
 
 All privacy behavior lives in [`@vskstudio/takt-core`](https://www.npmjs.com/package/@vskstudio/takt-core): Do Not Track support, localhost exclusion, opt-in/opt-out consent, and a frozen wire payload. This wrapper never alters any of it.
 
+## Widgets
+
+Thin wrappers over the server-rendered badge SVG and embed page. `<TaktBadge>` renders an `<img>`, `<TaktEmbed>` an `<iframe>`; both accept native passthrough props.
+
+```tsx
+import { TaktBadge, TaktEmbed } from '@vskstudio/takt-solid'
+
+;<TaktBadge domain="example.com" variant="d" glyph="dash" />
+;<TaktEmbed domain="example.com" theme="dark" />
+```
+
+For programmatic stats, `createStats` returns a typed public-API client:
+
+```ts
+import { createStats } from '@vskstudio/takt-solid'
+
+const stats = createStats({ domain: 'example.com' })
+const summary = await stats.summary({ period: '7d' })
+```
+
 ## License
 
 [MIT](./LICENSE)
