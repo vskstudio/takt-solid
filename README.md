@@ -145,6 +145,8 @@ import { TaktBadge, TaktEmbed } from '@vskstudio/takt-solid'
 ;<TaktEmbed domain="example.com" theme="dark" />
 ```
 
+The optional `host` prop must be an absolute `http(s)` URL (validated by core); `src` is wrapper-controlled and cannot be overridden.
+
 For programmatic stats, `createStats` returns a typed public-API client:
 
 ```ts

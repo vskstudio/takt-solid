@@ -1,7 +1,7 @@
 import { splitProps, mergeProps, type JSX } from 'solid-js'
 import { embedUrl, type EmbedTheme, type WidgetLang } from '@vskstudio/takt-core'
 
-export interface TaktEmbedProps extends JSX.IframeHTMLAttributes<HTMLIFrameElement> {
+export interface TaktEmbedProps extends Omit<JSX.IframeHTMLAttributes<HTMLIFrameElement>, 'src'> {
   /** Site identifier whose embed to render. */
   domain: string
   theme?: EmbedTheme
@@ -16,6 +16,7 @@ export function TaktEmbed(props: TaktEmbedProps): JSX.Element {
 
   return (
     <iframe
+      referrerpolicy="strict-origin-when-cross-origin"
       loading="lazy"
       style={{ border: 0 }}
       {...rest}

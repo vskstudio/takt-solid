@@ -1,7 +1,7 @@
 import { splitProps, type JSX } from 'solid-js'
 import { badgeUrl, type BadgeVariant, type BadgeGlyph, type WidgetLang } from '@vskstudio/takt-core'
 
-export interface TaktBadgeProps extends JSX.ImgHTMLAttributes<HTMLImageElement> {
+export interface TaktBadgeProps extends Omit<JSX.ImgHTMLAttributes<HTMLImageElement>, 'src'> {
   /** Site identifier whose badge to render. */
   domain: string
   variant?: BadgeVariant
