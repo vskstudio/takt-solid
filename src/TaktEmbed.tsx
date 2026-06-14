@@ -16,11 +16,12 @@ export function TaktEmbed(props: TaktEmbedProps): JSX.Element {
 
   return (
     <iframe
-      referrerpolicy="strict-origin-when-cross-origin"
       loading="lazy"
       style={{ border: 0 }}
       {...rest}
       src={embedUrl(own.domain, { host: own.host, theme: own.theme, lang: own.lang })}
+      referrerpolicy="strict-origin-when-cross-origin"
+      sandbox="allow-scripts allow-same-origin"
     />
   )
 }
