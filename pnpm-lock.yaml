@@ -24,8 +24,8 @@ importers:
         specifier: ^6.4.0
         version: 6.9.1
       '@vskstudio/takt-core':
-        specifier: ^0.3.0
-        version: 0.3.0
+        specifier: ^0.3.1
+        version: 0.3.1
       esbuild-plugin-solid:
         specifier: ^0.6.0
         version: 0.6.0(esbuild@0.27.7)(solid-js@1.9.13)
@@ -1232,8 +1232,8 @@ packages:
   '@vitest/utils@2.1.9':
     resolution: {integrity: sha512-v0psaMSkNJ3A2NMrUEHFRzJtDPFn+/VWZ5WxImB21T9fjucJRmS7xCS3ppEnARb9y11OAzaD+P2Ps+b+BGX5iQ==}
 
-  '@vskstudio/takt-core@0.3.0':
-    resolution: {integrity: sha512-Gu+bnI0RSJWaHYQeDH2D/ZFIfmFveXlsBY4INRDNNZvAs5nV86ra286ChsLEeZstrLbGhQQQqZDpb4arDNkJ5Q==}
+  '@vskstudio/takt-core@0.3.1':
+    resolution: {integrity: sha512-HzSuUWn6AM8VbJixDKMBiyvDRMcIInPodd4bl/9B017Z8A8yC4IL4eY1xYfPUl0u7FRYX7boCSu7xF4PlL04eQ==}
     engines: {node: '>=18'}
 
   acorn-jsx@5.3.2:
@@ -3726,7 +3726,7 @@ snapshots:
       loupe: 3.2.1
       tinyrainbow: 1.2.0
 
-  '@vskstudio/takt-core@0.3.0': {}
+  '@vskstudio/takt-core@0.3.1': {}
 
   acorn-jsx@5.3.2(acorn@8.17.0):
     dependencies:
