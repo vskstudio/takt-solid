@@ -145,7 +145,7 @@ import { TaktBadge, TaktEmbed } from '@vskstudio/takt-solid'
 ;<TaktEmbed domain="example.com" theme="dark" />
 ```
 
-The optional `host` prop must be an absolute `http(s)` URL (validated by core); `src` is wrapper-controlled and cannot be overridden.
+The embed `<iframe>` is hardened: it ships with `sandbox="allow-scripts allow-same-origin"` and a fixed `referrerpolicy="strict-origin-when-cross-origin"`, both wrapper-controlled and not overridable. The badge `alt` defaults to `"takt"` but can be overridden via passthrough. The optional `host` prop must be an absolute `http(s)` URL (validated by core, which reduces it to its origin); `src` is wrapper-controlled and cannot be overridden.
 
 For programmatic stats, `createStats` returns a typed public-API client:
 
