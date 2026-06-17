@@ -8,6 +8,8 @@ export interface TaktProps {
   domain?: string
   /** Ingestion endpoint. Defaults to `/api/event`. */
   endpoint?: string
+  /** First-party origin to derive the endpoint from (`{origin}/api/event`) — your Takt domain or a custom domain to dodge ad-blockers (endpoint wins over it). */
+  scriptOrigin?: string
   /** Auto-track outbound link clicks. */
   outbound?: boolean
   /** Auto-track file downloads. Pass an array to restrict to those extensions. */
@@ -30,6 +32,7 @@ export function Takt(props: TaktProps): JSX.Element {
     const takt = createTakt({
       domain: props.domain,
       endpoint: props.endpoint,
+      scriptOrigin: props.scriptOrigin,
       respectDnt: props.respectDnt ?? true,
       excludeLocalhost: props.excludeLocalhost ?? true,
     })
