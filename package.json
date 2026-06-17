@@ -60,7 +60,7 @@
     "e2e": "playwright test"
   },
   "peerDependencies": {
-    "@vskstudio/takt-core": ">=0.3.1",
+    "@vskstudio/takt-core": ">=0.4.0",
     "solid-js": "^1.8"
   },
   "devDependencies": {
