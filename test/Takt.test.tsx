@@ -56,6 +56,13 @@ describe('<Takt>', () => {
     expect(enableSpa).not.toHaveBeenCalled()
   })
 
+  it('forwards scriptOrigin to createTakt', () => {
+    render(() => <Takt scriptOrigin="https://t.example.com">x</Takt>)
+    expect(createTakt).toHaveBeenCalledWith(
+      expect.objectContaining({ scriptOrigin: 'https://t.example.com' }),
+    )
+  })
+
   it('passes privacy defaults through to createTakt', () => {
     render(() => <Takt respectDnt={false}>x</Takt>)
     expect(createTakt).toHaveBeenCalledWith(
