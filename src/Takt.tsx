@@ -16,6 +16,8 @@ export interface TaktProps {
   files?: boolean | string[]
   /** Track SPA navigations (history pushState/replaceState + popstate). */
   spa?: boolean
+  /** Report a `404` event when the page is an error page (`[data-takt-404]` / `<meta name="takt:404">` marker, or a 404 HTTP status). */
+  track404?: boolean
   /** Suppress events when the browser's Do Not Track is enabled. */
   respectDnt?: boolean
   /** Suppress events on localhost and private IP ranges. */
@@ -40,6 +42,7 @@ export function Takt(props: TaktProps): JSX.Element {
     if (props.spa ?? true) disposers.push(takt.enableSpa())
     if (props.outbound) disposers.push(takt.enableOutbound())
     if (props.files) disposers.push(takt.enableFiles(Array.isArray(props.files) ? props.files : undefined))
+    if (props.track404) disposers.push(takt.enable404())
     takt.pageview()
 
     setInstance(takt)

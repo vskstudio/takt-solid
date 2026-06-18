@@ -77,6 +77,7 @@ export function SignupButton() {
 | `outbound`         | `boolean`             | `false`              | Auto-track outbound link clicks.                               |
 | `files`            | `boolean \| string[]` | `false`              | Auto-track file downloads; pass extensions to restrict.        |
 | `spa`              | `boolean`             | `true`               | Track SPA navigations (pushState/replaceState + popstate).     |
+| `track404`         | `boolean`             | `false`              | Report a `404` event when the page is an error page (`[data-takt-404]` / `<meta name="takt:404">` marker, or a 404 HTTP status). |
 | `respectDnt`       | `boolean`             | `true`               | Suppress events when the browser's Do Not Track is enabled.    |
 | `excludeLocalhost` | `boolean`             | `true`               | Suppress events on localhost and private IP ranges.            |
 
@@ -125,7 +126,7 @@ import '@vskstudio/takt-solid/element'
 <takt-analytics domain="example.com" outbound files></takt-analytics>
 ```
 
-Privacy attributes (`respect-dnt`, `exclude-localhost`, `spa`) are on by default and only disabled by an explicit `"false"`/`"0"`. Presence flags (`outbound`, `files`) activate when the attribute is present.
+Privacy attributes (`respect-dnt`, `exclude-localhost`, `spa`) are on by default and only disabled by an explicit `"false"`/`"0"`. Presence flags (`outbound`, `files`, `track-404`) activate when the attribute is present.
 
 ## SSR
 

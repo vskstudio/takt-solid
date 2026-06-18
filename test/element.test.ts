@@ -1,12 +1,13 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
-const { enableSpa, enableOutbound, enableFiles, pageview, createTakt } = vi.hoisted(() => {
+const { enableSpa, enableOutbound, enableFiles, enable404, pageview, createTakt } = vi.hoisted(() => {
   const enableSpa = vi.fn(() => vi.fn())
   const enableOutbound = vi.fn(() => vi.fn())
   const enableFiles = vi.fn(() => vi.fn())
+  const enable404 = vi.fn(() => vi.fn())
   const pageview = vi.fn()
-  const createTakt = vi.fn(() => ({ enableSpa, enableOutbound, enableFiles, pageview }))
-  return { enableSpa, enableOutbound, enableFiles, pageview, createTakt }
+  const createTakt = vi.fn(() => ({ enableSpa, enableOutbound, enableFiles, enable404, pageview }))
+  return { enableSpa, enableOutbound, enableFiles, enable404, pageview, createTakt }
 })
 vi.mock('@vskstudio/takt-core', () => ({ createTakt }))
 
@@ -56,6 +57,15 @@ describe('<takt-analytics> element', () => {
     expect(enableOutbound).toHaveBeenCalledOnce()
     expect(enableFiles).toHaveBeenCalledOnce()
     expect(enableSpa).not.toHaveBeenCalled()
+    el.remove()
+  })
+
+  it('enables 404 when track-404 attribute is present', () => {
+    defineTaktElement()
+    const el = document.createElement('takt-analytics')
+    el.setAttribute('track-404', '')
+    document.body.appendChild(el)
+    expect(enable404).toHaveBeenCalledOnce()
     el.remove()
   })
 
