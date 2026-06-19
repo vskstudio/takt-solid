@@ -2,14 +2,15 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render } from '@solidjs/testing-library'
 import { createEffect } from 'solid-js'
 
-const { enableSpa, enableOutbound, enableFiles, enable404, pageview, createTakt } = vi.hoisted(() => {
+const { enableSpa, enableOutbound, enableFiles, enable404, enableTagged, pageview, createTakt } = vi.hoisted(() => {
   const enableSpa = vi.fn(() => vi.fn())
   const enableOutbound = vi.fn(() => vi.fn())
   const enableFiles = vi.fn(() => vi.fn())
   const enable404 = vi.fn(() => vi.fn())
+  const enableTagged = vi.fn(() => vi.fn())
   const pageview = vi.fn()
-  const createTakt = vi.fn(() => ({ enableSpa, enableOutbound, enableFiles, enable404, pageview, track: vi.fn() }))
-  return { enableSpa, enableOutbound, enableFiles, enable404, pageview, createTakt }
+  const createTakt = vi.fn(() => ({ enableSpa, enableOutbound, enableFiles, enable404, enableTagged, pageview, track: vi.fn() }))
+  return { enableSpa, enableOutbound, enableFiles, enable404, enableTagged, pageview, createTakt }
 })
 
 vi.mock('@vskstudio/takt-core', () => ({ createTakt }))
@@ -64,6 +65,16 @@ describe('<Takt>', () => {
     expect(enable404).toHaveBeenCalledOnce()
   })
 
+  it('enables tagged when tagged prop is set and disposes on unmount', () => {
+    const disposeTagged = vi.fn()
+    enableTagged.mockReturnValueOnce(disposeTagged)
+    const { unmount } = render(() => <Takt domain="example.com" tagged>x</Takt>)
+    expect(enableTagged).toHaveBeenCalledOnce()
+    expect(disposeTagged).not.toHaveBeenCalled()
+    unmount()
+    expect(disposeTagged).toHaveBeenCalledOnce()
+  })
+
   it('forwards scriptOrigin to createTakt', () => {
     render(() => <Takt scriptOrigin="https://t.example.com">x</Takt>)
     expect(createTakt).toHaveBeenCalledWith(
@@ -79,7 +90,7 @@ describe('<Takt>', () => {
   })
 
   it('provides the live instance via context to useTakt()', () => {
-    const created = { enableSpa, enableOutbound, enableFiles, enable404, pageview, track: vi.fn() }
+    const created = { enableSpa, enableOutbound, enableFiles, enable404, enableTagged, pageview, track: vi.fn() }
     createTakt.mockReturnValueOnce(created)
     let seen: unknown
     function Child() {
