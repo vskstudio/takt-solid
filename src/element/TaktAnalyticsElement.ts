@@ -13,17 +13,27 @@ export function createTaktAnalyticsElement(): CustomElementConstructor {
 
     connectedCallback(): void {
       const attr = (name: string): string | null => this.getAttribute(name)
+      const sampleRateAttr = attr('sample-rate')
+      const queryParamsAttr = attr('query-params')
+      const queryParams = queryParamsAttr
+        ? queryParamsAttr.split(',').map((s) => s.trim()).filter(Boolean)
+        : undefined
       const takt = createTakt({
         domain: attr('domain') ?? undefined,
         endpoint: attr('endpoint') ?? undefined,
         scriptOrigin: attr('script-origin') ?? undefined,
         respectDnt: truthy(attr('respect-dnt')),
         excludeLocalhost: truthy(attr('exclude-localhost')),
+        ...(sampleRateAttr !== null ? { sampleRate: parseFloat(sampleRateAttr) } : {}),
+        ...(this.hasAttribute('track-query') ? { trackQuery: true } : {}),
+        ...(queryParams && queryParams.length > 0 ? { queryParams } : {}),
+        ...(this.hasAttribute('enabled') ? { enabled: truthy(attr('enabled')) } : {}),
       })
       if (truthy(attr('spa'))) this.disposers.push(takt.enableSpa())
       if (this.hasAttribute('outbound')) this.disposers.push(takt.enableOutbound())
       if (this.hasAttribute('files')) this.disposers.push(takt.enableFiles())
       if (this.hasAttribute('track-404')) this.disposers.push(takt.enable404())
+      if (this.hasAttribute('tagged')) this.disposers.push(takt.enableTagged())
       takt.pageview()
     }
 

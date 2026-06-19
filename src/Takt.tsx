@@ -22,6 +22,18 @@ export interface TaktProps {
   respectDnt?: boolean
   /** Suppress events on localhost and private IP ranges. */
   excludeLocalhost?: boolean
+  /** Master switch — set to `false` to fully disable tracking. */
+  enabled?: boolean
+  /** Fraction of sessions to track (0–1). */
+  sampleRate?: number
+  /** Include the query string in page URLs. */
+  trackQuery?: boolean
+  /** Query parameters to keep when `trackQuery` is false. */
+  queryParams?: string[]
+  /** Transform page URLs before they are sent (dev-controlled function, config only). */
+  scrubUrl?: (url: string) => string
+  /** Auto-track `[data-takt-tag]` element clicks. */
+  tagged?: boolean
   children?: JSX.Element
 }
 
@@ -37,12 +49,18 @@ export function Takt(props: TaktProps): JSX.Element {
       scriptOrigin: props.scriptOrigin,
       respectDnt: props.respectDnt ?? true,
       excludeLocalhost: props.excludeLocalhost ?? true,
+      enabled: props.enabled,
+      sampleRate: props.sampleRate,
+      trackQuery: props.trackQuery,
+      queryParams: props.queryParams,
+      scrubUrl: props.scrubUrl,
     })
     const disposers: Array<() => void> = []
     if (props.spa ?? true) disposers.push(takt.enableSpa())
     if (props.outbound) disposers.push(takt.enableOutbound())
     if (props.files) disposers.push(takt.enableFiles(Array.isArray(props.files) ? props.files : undefined))
     if (props.track404) disposers.push(takt.enable404())
+    if (props.tagged) disposers.push(takt.enableTagged())
     takt.pageview()
 
     setInstance(takt)
