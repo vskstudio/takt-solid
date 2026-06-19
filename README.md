@@ -80,6 +80,12 @@ export function SignupButton() {
 | `track404`         | `boolean`             | `false`              | Report a `404` event when the page is an error page (`[data-takt-404]` / `<meta name="takt:404">` marker, or a 404 HTTP status). |
 | `respectDnt`       | `boolean`             | `true`               | Suppress events when the browser's Do Not Track is enabled.    |
 | `excludeLocalhost` | `boolean`             | `true`               | Suppress events on localhost and private IP ranges.            |
+| `enabled`          | `boolean`             | `true`               | Master switch — set to `false` to fully disable tracking.      |
+| `sampleRate`       | `number`              | `1`                  | Fraction of sessions to track (0–1).                           |
+| `trackQuery`       | `boolean`             | `false`              | Include the query string in page URLs.                         |
+| `queryParams`      | `string[]`            | —                    | Query parameters to keep when `trackQuery` is false.           |
+| `scrubUrl`         | `(url: string) => string` | —              | Transform page URLs before they are sent. Function prop — config only, not available as a custom-element attribute. |
+| `tagged`           | `boolean`             | `false`              | Auto-track `[data-takt-tag]` element clicks.                   |
 
 > Config props are read once when `<Takt>` mounts. Changing them afterwards has no effect — remount the component to reconfigure.
 
