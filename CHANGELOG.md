@@ -1,5 +1,12 @@
 # @vskstudio/takt-solid
 
+## 0.5.0
+
+### Minor Changes
+
+- ff9a047: Expose advanced tracker options: enabled, sampleRate, trackQuery, queryParams,
+  scrubUrl (function prop / config only) and tagged. Peer dep raised to takt-core >=0.5.0.
+
 ## 0.3.1
 
 ### Patch Changes
