@@ -84,6 +84,7 @@ export function SignupButton() {
 | `sampleRate`       | `number`              | `1`                  | Fraction of sessions to track (0–1).                           |
 | `trackQuery`       | `boolean`             | `false`              | Include the query string in page URLs.                         |
 | `queryParams`      | `string[]`            | —                    | Query parameters to keep when `trackQuery` is false.           |
+| `exclude`          | `string[]`            | —                    | Path prefixes never tracked, e.g. `['/app', '/account']` (segment-bounded, checked at send time). |
 | `scrubUrl`         | `(url: string) => string` | —              | Transform page URLs before they are sent. Function prop — config only, not available as a custom-element attribute. |
 | `tagged`           | `boolean`             | `false`              | Auto-track `[data-takt-tag]` element clicks.                   |
 
