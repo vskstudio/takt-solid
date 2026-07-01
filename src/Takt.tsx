@@ -30,6 +30,8 @@ export interface TaktProps {
   trackQuery?: boolean
   /** Query parameters to keep when `trackQuery` is false. */
   queryParams?: string[]
+  /** Path prefixes never tracked, e.g. `['/app','/account']`. Segment-bounded: `'/app'` matches `'/app'` and `'/app/…'` but not `'/application'`. */
+  exclude?: string[]
   /** Transform page URLs before they are sent (dev-controlled function, config only). */
   scrubUrl?: (url: string) => string
   /** Auto-track `[data-takt-tag]` element clicks. */
@@ -53,6 +55,7 @@ export function Takt(props: TaktProps): JSX.Element {
       sampleRate: props.sampleRate,
       trackQuery: props.trackQuery,
       queryParams: props.queryParams,
+      exclude: props.exclude,
       scrubUrl: props.scrubUrl,
     })
     const disposers: Array<() => void> = []

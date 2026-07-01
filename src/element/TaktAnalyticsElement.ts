@@ -18,6 +18,10 @@ export function createTaktAnalyticsElement(): CustomElementConstructor {
       const queryParams = queryParamsAttr
         ? queryParamsAttr.split(',').map((s) => s.trim()).filter(Boolean)
         : undefined
+      const excludeAttr = attr('exclude')
+      const exclude = excludeAttr
+        ? excludeAttr.split(',').map((s) => s.trim()).filter(Boolean)
+        : undefined
       const takt = createTakt({
         domain: attr('domain') ?? undefined,
         endpoint: attr('endpoint') ?? undefined,
@@ -27,6 +31,7 @@ export function createTaktAnalyticsElement(): CustomElementConstructor {
         ...(sampleRateAttr !== null && Number.isFinite(parseFloat(sampleRateAttr)) ? { sampleRate: parseFloat(sampleRateAttr) } : {}),
         ...(this.hasAttribute('track-query') ? { trackQuery: true } : {}),
         ...(queryParams && queryParams.length > 0 ? { queryParams } : {}),
+        ...(exclude && exclude.length > 0 ? { exclude } : {}),
         ...(this.hasAttribute('enabled') ? { enabled: truthy(attr('enabled')) } : {}),
       })
       if (truthy(attr('spa'))) this.disposers.push(takt.enableSpa())
