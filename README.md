@@ -2,6 +2,8 @@
 
 # @vskstudio/takt-solid
 
+
+> 📚 **Documentation** — [taktlytics.com/docs/wrappers/solid](https://taktlytics.com/docs/wrappers/solid)
 **Idiomatic SolidJS wrapper for [Takt](https://github.com/vskstudio/takt-core) privacy-friendly analytics.**
 
 [![npm version](https://img.shields.io/npm/v/@vskstudio/takt-solid?color=2c4f7c&logo=npm)](https://www.npmjs.com/package/@vskstudio/takt-solid)
