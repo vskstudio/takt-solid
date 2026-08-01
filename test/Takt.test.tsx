@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render } from '@solidjs/testing-library'
-import { createEffect } from 'solid-js'
+import { getOwner, runWithOwner } from 'solid-js'
 
 const { enableSpa, enableOutbound, enableFiles, enable404, enableTagged, pageview, createTakt } = vi.hoisted(() => {
   const enableSpa = vi.fn(() => vi.fn())
@@ -17,12 +17,24 @@ vi.mock('@vskstudio/takt-core', () => ({ createTakt }))
 
 import { Takt } from '../src/Takt'
 import { useTakt } from '../src/useTakt'
-import { taktStore } from '../src/store'
+import { taktStore, type TaktInstance } from '../src/store'
 
 beforeEach(() => {
   vi.clearAllMocks()
   taktStore.value = null
 })
+
+const makeInstance = () => ({ enableSpa, enableOutbound, enableFiles, enable404, enableTagged, pageview, track: vi.fn() })
+
+// Capture l'owner du descendant pour rejouer useTakt() après le montage,
+// comme le ferait un gestionnaire de clic, sans effet de contournement.
+const readers: Record<string, () => TaktInstance | undefined> = {}
+
+function Reader(props: { id: string }) {
+  const owner = getOwner()
+  readers[props.id] = () => runWithOwner(owner, () => useTakt())
+  return null
+}
 
 describe('<Takt>', () => {
   it('boots on mount: createTakt + spa + pageview, publishes to the store', () => {
@@ -90,22 +102,62 @@ describe('<Takt>', () => {
   })
 
   it('provides the live instance via context to useTakt()', () => {
-    const created = { enableSpa, enableOutbound, enableFiles, enable404, enableTagged, pageview, track: vi.fn() }
+    const created = makeInstance()
     createTakt.mockReturnValueOnce(created)
-    let seen: unknown
-    function Child() {
-      // Context value is published in onMount; read it reactively so the test
-      // observes the live instance once it arrives (not the pre-mount no-op).
-      createEffect(() => {
-        seen = useTakt()
-      })
-      return null
-    }
     render(() => (
       <Takt>
-        <Child />
+        <Reader id="solo" />
       </Takt>
     ))
-    expect(seen).toBe(created)
+    // Le repli hors arbre est neutralisé : seul le contexte peut répondre.
+    taktStore.value = null
+    expect(readers.solo()).toBe(created)
+  })
+
+  it('gives sibling <Takt> subtrees their own instance', () => {
+    const first = makeInstance()
+    const second = makeInstance()
+    createTakt.mockReturnValueOnce(first).mockReturnValueOnce(second)
+    render(() => (
+      <>
+        <Takt domain="first.example">
+          <Reader id="first" />
+        </Takt>
+        <Takt domain="second.example">
+          <Reader id="second" />
+        </Takt>
+      </>
+    ))
+    expect(readers.first()).toBe(first)
+    expect(readers.second()).toBe(second)
+  })
+
+  it('gives a nested <Takt> subtree the innermost instance', () => {
+    const outer = makeInstance()
+    const inner = makeInstance()
+    createTakt.mockReturnValueOnce(outer).mockReturnValueOnce(inner)
+    render(() => (
+      <Takt domain="outer.example">
+        <Reader id="outer" />
+        <Takt domain="inner.example">
+          <Reader id="inner" />
+        </Takt>
+      </Takt>
+    ))
+    expect(readers.outer()).toBe(outer)
+    expect(readers.inner()).toBe(inner)
+  })
+
+  it('falls back to the no-op once the subtree is unmounted', () => {
+    const created = makeInstance()
+    createTakt.mockReturnValueOnce(created)
+    vi.spyOn(console, 'warn').mockImplementation(() => {})
+    const { unmount } = render(() => (
+      <Takt>
+        <Reader id="gone" />
+      </Takt>
+    ))
+    unmount()
+    expect(readers.gone()).not.toBe(created)
   })
 })
