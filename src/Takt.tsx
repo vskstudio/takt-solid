@@ -1,7 +1,7 @@
 import { createSignal, onCleanup, onMount, type JSX } from 'solid-js'
 import { isServer } from 'solid-js/web'
 import { createTakt } from '@vskstudio/takt-core'
-import { TaktContext, taktStore, type TaktInstance } from './store'
+import { TaktContext, taktStore, type TaktChannel, type TaktInstance } from './store'
 
 export interface TaktProps {
   /** Site identifier sent with every event. Defaults to `location.hostname`. */
@@ -34,13 +34,15 @@ export interface TaktProps {
   exclude?: string[]
   /** Transform page URLs before they are sent (dev-controlled function, config only). */
   scrubUrl?: (url: string) => string
-  /** Auto-track `[data-takt-tag]` element clicks. */
+  /** Auto-track `[data-takt-event]` element clicks (props read from `data-takt-prop-*`). */
   tagged?: boolean
   children?: JSX.Element
 }
 
 export function Takt(props: TaktProps): JSX.Element {
   const [instance, setInstance] = createSignal<TaktInstance | null>(null)
+  // Objet stable : c'est lui que le contexte fige, l'accesseur reste vivant.
+  const channel: TaktChannel = { instance }
 
   onMount(() => {
     // Never boot on the server: createTakt touches location/window.
@@ -72,9 +74,10 @@ export function Takt(props: TaktProps): JSX.Element {
     onCleanup(() => {
       disposers.forEach((dispose) => dispose())
       setInstance(null)
-      taktStore.value = null
+      // Ne pas effacer le repli publié par un autre <Takt> encore monté.
+      if (taktStore.value === takt) taktStore.value = null
     })
   })
 
-  return <TaktContext.Provider value={instance()}>{props.children}</TaktContext.Provider>
+  return <TaktContext.Provider value={channel}>{props.children}</TaktContext.Provider>
 }
