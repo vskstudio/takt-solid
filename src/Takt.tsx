@@ -34,7 +34,7 @@ export interface TaktProps {
   exclude?: string[]
   /** Transform page URLs before they are sent (dev-controlled function, config only). */
   scrubUrl?: (url: string) => string
-  /** Auto-track `[data-takt-tag]` element clicks. */
+  /** Auto-track `[data-takt-event]` element clicks (props read from `data-takt-prop-*`). */
   tagged?: boolean
   children?: JSX.Element
 }

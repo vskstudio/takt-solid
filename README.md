@@ -15,7 +15,7 @@
 A thin, SSR-safe Solid layer over [`@vskstudio/takt-core`](https://www.npmjs.com/package/@vskstudio/takt-core). It never changes the wire payload or the privacy guarantees — it just makes Takt feel native in a Solid app.
 
 - **`<Takt>` component** — drop it once near the root; it boots analytics in `onMount` and provides the instance to the tree.
-- **`useTakt()`** — grab the live instance anywhere; returns a never-throwing no-op before mount or during SSR.
+- **`useTakt()`** — resolve the live instance at call time, anywhere; returns a never-throwing no-op before mount or during SSR.
 - **`createTaktEvent()` & `<TaktEvent>`** — declarative click tracking.
 - **`<takt-analytics>` custom element** — framework-agnostic, Solid-free embed for non-Solid pages.
 
@@ -25,7 +25,7 @@ A thin, SSR-safe Solid layer over [`@vskstudio/takt-core`](https://www.npmjs.com
 pnpm add @vskstudio/takt-solid @vskstudio/takt-core
 ```
 
-`solid-js` (`^1.8`) and `@vskstudio/takt-core` are peer dependencies.
+`solid-js` (`^1.8`) and `@vskstudio/takt-core` (`>=0.8.1`) are peer dependencies.
 
 ## Quick start — provider + accessor
 
@@ -49,11 +49,12 @@ Then track custom events from any descendant:
 import { useTakt } from '@vskstudio/takt-solid'
 
 export function SignupButton() {
-  const takt = useTakt()
   return (
     <button
       onClick={() =>
-        takt.track('Signup', {
+        // Resolve at click time — `<Takt>` boots in onMount, so a call in the
+        // component body would capture (and keep) the pre-mount no-op.
+        useTakt().track('Signup', {
           props: { plan: 'pro' },
           revenue: { amount: '29.00', currency: 'EUR' },
         })
@@ -65,14 +66,14 @@ export function SignupButton() {
 }
 ```
 
-`useTakt()` always returns a usable instance: before `<Takt>` mounts (or during SSR) it hands back a never-throwing no-op, so your handlers never crash.
+`useTakt()` resolves the instance **at call time** and always returns something usable: before `<Takt>` mounts (or during SSR) it hands back a never-throwing no-op, so your handlers never crash. Call it inside the handler, or inside `onMount`/`createEffect` if you need to hold on to it — never at the top of the component body, where the returned value would be the no-op forever.
 
 ## `<Takt>` props
 
 | Prop               | Type                  | Default              | Description                                                     |
 | ------------------ | --------------------- | -------------------- | -------------------------------------------------------------- |
 | `domain`           | `string`              | `location.hostname`  | Site identifier sent with every event.                         |
-| `endpoint`         | `string`              | `/api/event`         | Ingestion endpoint.                                            |
+| `endpoint`         | `string`              | `https://taktlytics.com/api/event` | Ingestion endpoint. Pass `/api/event` for a same-origin first-party proxy. |
 | `scriptOrigin`     | `string`              | —                    | First-party origin to derive the endpoint from (`{origin}/api/event`) — your Takt domain or a custom domain to dodge ad-blockers (endpoint wins over it). |
 | `outbound`         | `boolean`             | `false`              | Auto-track outbound link clicks.                               |
 | `files`            | `boolean \| string[]` | `false`              | Auto-track file downloads; pass extensions to restrict.        |
@@ -86,7 +87,7 @@ export function SignupButton() {
 | `queryParams`      | `string[]`            | —                    | Query parameters to keep when `trackQuery` is false.           |
 | `exclude`          | `string[]`            | —                    | Path prefixes never tracked, e.g. `['/app', '/account']` (segment-bounded, checked at send time). |
 | `scrubUrl`         | `(url: string) => string` | —              | Transform page URLs before they are sent. Function prop — config only, not available as a custom-element attribute. |
-| `tagged`           | `boolean`             | `false`              | Auto-track `[data-takt-tag]` element clicks.                   |
+| `tagged`           | `boolean`             | `false`              | Auto-track `[data-takt-event]` element clicks; props are read from `data-takt-prop-*` attributes. |
 
 > Config props are read once when `<Takt>` mounts. Changing them afterwards has no effect — remount the component to reconfigure.
 
@@ -133,7 +134,25 @@ import '@vskstudio/takt-solid/element'
 <takt-analytics domain="example.com" outbound files></takt-analytics>
 ```
 
-Privacy attributes (`respect-dnt`, `exclude-localhost`, `spa`) are on by default and only disabled by an explicit `"false"`/`"0"`. Presence flags (`outbound`, `files`, `track-404`) activate when the attribute is present.
+| Attribute          | Kind          | Notes                                                          |
+| ------------------ | ------------- | -------------------------------------------------------------- |
+| `domain`           | value         | Site identifier.                                                |
+| `endpoint`         | value         | Ingestion endpoint.                                             |
+| `script-origin`    | value         | First-party origin to derive the endpoint from.                 |
+| `sample-rate`      | value         | Fraction of sessions to track (0–1); ignored if not a number.   |
+| `query-params`     | value         | Comma-separated list of query parameters to keep.               |
+| `exclude`          | value         | Comma-separated path prefixes never tracked.                    |
+| `respect-dnt`      | default-on    | Disabled only by `"false"`/`"0"`.                               |
+| `exclude-localhost`| default-on    | Disabled only by `"false"`/`"0"`.                               |
+| `spa`              | default-on    | Disabled only by `"false"`/`"0"`.                               |
+| `track-query`      | opt-in value  | Applied only when the attribute is present; `"false"`/`"0"` turns it off. |
+| `enabled`          | opt-in value  | Applied only when the attribute is present; `"false"`/`"0"` disables tracking. |
+| `outbound`         | presence flag | Auto-track outbound link clicks.                                |
+| `files`            | presence flag | Auto-track file downloads (all default extensions).             |
+| `track-404`        | presence flag | Report a `404` event on error pages.                            |
+| `tagged`           | presence flag | Auto-track `[data-takt-event]` element clicks.                  |
+
+Privacy attributes are on by default and only disabled by an explicit `"false"`/`"0"`; presence flags activate when the attribute exists at all. `scrubUrl` is a function prop and has no attribute equivalent.
 
 ## SSR
 
@@ -164,6 +183,8 @@ import { createStats } from '@vskstudio/takt-solid'
 const stats = createStats({ domain: 'example.com' })
 const summary = await stats.summary({ period: '7d' })
 ```
+
+The package also re-exports `badgeUrl`, `embedUrl` and `PublicApiError` from core, along with the widget and stats types, so you never need a direct import from `@vskstudio/takt-core` for them.
 
 ## License
 
