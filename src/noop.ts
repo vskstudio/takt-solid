@@ -5,7 +5,15 @@ import type { createTakt } from '@vskstudio/takt-core'
 // for context/store values invalid (TS4094).
 export type TaktInstance = Pick<
   ReturnType<typeof createTakt>,
-  'track' | 'pageview' | 'enableSpa' | 'enableOutbound' | 'enableFiles' | 'enable404' | 'optOut' | 'optIn'
+  | 'track'
+  | 'pageview'
+  | 'enableSpa'
+  | 'enableOutbound'
+  | 'enableFiles'
+  | 'enable404'
+  | 'enableTagged'
+  | 'optOut'
+  | 'optIn'
 >
 
 let _noop: TaktInstance | null = null
@@ -27,6 +35,7 @@ export function noopTakt(): TaktInstance {
     enableOutbound: noDispose,
     enableFiles: noDispose,
     enable404: noDispose,
+    enableTagged: noDispose,
     optOut: () => {},
     optIn: () => {},
   }
